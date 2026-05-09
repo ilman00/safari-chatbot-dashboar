@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const links = [
   { to: "/", label: "Dashboard", icon: "📊" },
@@ -19,10 +19,31 @@ export default function Sidebar() {
 
   const closeMobile = () => setMobileOpen(false);
 
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
+  // Close on Escape key
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeMobile();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
   return (
     <>
       {/* ───────── MOBILE TOP BAR ───────── */}
-      <header className="md:hidden fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-4 bg-white border-b border-gray-200 z-40">
+      <header className="md:hidden fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-4 bg-white border-b border-gray-200 z-30">
         <div className="flex items-center gap-2">
           <span className="text-xl">🏜️</span>
           <span className="text-gray-900 font-bold text-sm">
@@ -33,7 +54,8 @@ export default function Sidebar() {
         <button
           onClick={() => setMobileOpen((o) => !o)}
           className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition"
-          aria-label="Toggle menu"
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
         >
           {mobileOpen ? (
             <svg
@@ -68,12 +90,15 @@ export default function Sidebar() {
       </header>
 
       {/* ───────── MOBILE BACKDROP ───────── */}
-      {mobileOpen && (
-        <div
-          className="md:hidden fixed inset-0 bg-black/40 z-40"
-          onClick={closeMobile}
-        />
-      )}
+      <div
+        aria-hidden="true"
+        onClick={closeMobile}
+        className={`
+          md:hidden fixed inset-0 bg-black/40 z-40
+          transition-opacity duration-300
+          ${mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
+        `}
+      />
 
       {/* ───────── SIDEBAR ───────── */}
       <aside
@@ -85,15 +110,14 @@ export default function Sidebar() {
           ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
           md:translate-x-0
         `}
+        aria-label="Sidebar navigation"
       >
         {/* Brand */}
         <div className="px-6 py-6 border-b border-gray-100">
           <div className="text-2xl mb-1">🏜️</div>
-
           <h1 className="text-gray-900 font-bold text-base leading-tight">
             Share Desert Safari
           </h1>
-
           <p className="text-gray-400 text-xs mt-0.5">Admin Panel</p>
         </div>
 

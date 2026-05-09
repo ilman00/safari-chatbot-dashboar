@@ -28,8 +28,8 @@ export default function Customers() {
   const fetchCustomers = async () => {
     try {
       const res = await api.get("/admin/conversations");
-      setCustomers(res.data);
-      setFiltered(res.data);
+      setCustomers(res.data.data);
+      setFiltered(res.data.data);
     } catch (error) {
       console.error("Failed to fetch customers", error);
     } finally {

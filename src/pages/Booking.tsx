@@ -65,7 +65,7 @@ export default function Bookings() {
       if (packageFilter) params.package = packageFilter;
 
       const res = await api.get("/admin/bookings", { params });
-      setBookings(res.data);
+      setBookings(res.data.data);
     } catch {
       console.error("Failed to fetch bookings");
     } finally {
